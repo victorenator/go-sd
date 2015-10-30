@@ -4,7 +4,7 @@ Go library for systemd
 ## Socket Activation
 
 ```go
-import "github.com/victoranator/go-sd"
+import "github.com/victorenator/go-sd"
 
 func main() {
     fds, _ := sd.Listeners()
@@ -25,7 +25,7 @@ func main() {
 ## Type=notify
 
 ```go
-import "github.com/victoranator/go-sd"
+import "github.com/victorenator/go-sd"
 
 func main() {
     sd.Notify("STATUS=Starting ...\n")
