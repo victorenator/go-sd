@@ -12,15 +12,16 @@ func RootResource(w http.ResponseWriter, r *http.Request) {
 func main() {
     http.HandleFunc("/", RootResource)
 
-    ls, _ := sd.Listeners()
-    if len(ls) > 0 {
-        for i, l := range ls {
-            fmt.Printf("%d; Name: %s; Addr: %s\n", i, l.Name(), l.Addr().String())
+    fds := sd.Listeners()
+    for i, fd := range fds {
+        fmt.Printf("%d; Name: %s\n", i, fd.Name())
+        l, _ := fd.Listener()
+        if i < len(fds) - 1 {
+            go func() {
+                http.Serve(l, nil)
+            }()
+        } else {
             http.Serve(l, nil)
-            defer l.Close()
         }
-
-    } else {
-        http.ListenAndServe(":8088", nil)
     }
 }

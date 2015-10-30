@@ -1,0 +1,6 @@
+[Unit]
+Description=HTTP Activation Service
+
+[Service]
+ExecStart=/home/vic/bin/http-activation
+Sockets=http-activation-a.socket http-activation-b.socket

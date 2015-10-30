@@ -1,0 +1,6 @@
+[Unit]
+Description=Notify Service
+
+[Service]
+ExecStart=/home/vic/bin/notify
+Type=notify

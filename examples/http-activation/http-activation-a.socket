@@ -1,0 +1,7 @@
+[Unit]
+Description=HTTP Activation Socket A
+
+[Socket]
+ListenStream=10080
+Service=http-activation.service
+FileDescriptorName=a
