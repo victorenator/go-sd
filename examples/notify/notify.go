@@ -1,19 +1,35 @@
 package main
 
 import "github.com/victorenator/go-sd"
-import "net/http"
 import "io"
+import "net/http"
+import "os"
+import "os/signal"
+import "syscall"
 import "time"
 
-func RootResource(w http.ResponseWriter, r *http.Request) {
-    io.WriteString(w, "hello\n");
+func WaitForTerminate() {
+    signalCh := make(chan os.Signal, 1)
+    signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
+    <- signalCh
 }
 
 func main() {
-    http.HandleFunc("/", RootResource)
-
     sd.Notify("STATUS=Starting ...")
-    time.Sleep(10 * time.Second)
+    
+    http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+        io.WriteString(w, "hello\n");
+    })
+
+    time.Sleep(2 * time.Second)
+    
     sd.Notify("READY=1\nSTATUS=Ready to process ...")
-    http.ListenAndServe(":8088", nil)
+    go func() {
+        http.ListenAndServe(":8088", nil)
+    }()
+    
+    WaitForTerminate()
+    
+    sd.Notify("STOPPING=1\nSTATUS=Stopping ...")
+    time.Sleep(2 * time.Second)
 }

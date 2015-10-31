@@ -1,6 +1,5 @@
 package sd
 
-import "fmt"
 import "net"
 import "os"
 import "strconv"
@@ -10,22 +9,22 @@ import "syscall"
 const START_FD int = 3
 
 type FileDescriptor struct {
-	fd int
+	fd   int
 	name string
 }
 
 type FD interface {
-        FD() int
-        Name() string
+	FD() int
+	Name() string
 	Listener() (net.Listener, error)
 }
 
 func (l FileDescriptor) FD() int {
-    return l.fd
+	return l.fd
 }
 
 func (l FileDescriptor) Name() string {
-    return l.name
+	return l.name
 }
 
 func (l FileDescriptor) Listener() (net.Listener, error) {
@@ -42,9 +41,9 @@ func ListenPID() int {
 }
 
 func ListenFDs() int {
-        if ListenPID() != os.Getpid() {
-            return 0
-        }
+	if ListenPID() != os.Getpid() {
+		return 0
+	}
 	fds, err := strconv.ParseInt(os.Getenv("LISTEN_FDS"), 10, 16)
 	if err != nil {
 		return 0
@@ -62,8 +61,8 @@ func Listeners() []FileDescriptor {
 	names := ListenFDNames()
 	ls := make([]FileDescriptor, fds)
 	for i := 0; i < fds; i++ {
-            ls[i].fd = START_FD + i
-            ls[i].name = names[i]
+		ls[i].fd = START_FD + i
+		ls[i].name = names[i]
 	}
 
 	return ls
@@ -71,7 +70,6 @@ func Listeners() []FileDescriptor {
 
 func Notify(state string, fds ...int) {
 	ns := os.Getenv("NOTIFY_SOCKET")
-        fmt.Printf("Notify %v %v %s\n", state, fds, ns)
 	if ns == "" {
 		return
 	}
@@ -87,13 +85,13 @@ func Notify(state string, fds ...int) {
 	}
 
 	defer conn.Close()
-        
-        if len(fds) > 0 {
-            rights := syscall.UnixRights(fds...)
 
-            conn.WriteMsgUnix([]byte(state), rights, nil)
-            
-        } else {
-            conn.Write([]byte(state))
-        }
+	if len(fds) > 0 {
+		rights := syscall.UnixRights(fds...)
+
+		conn.WriteMsgUnix([]byte(state), rights, nil)
+
+	} else {
+		conn.Write([]byte(state))
+	}
 }
